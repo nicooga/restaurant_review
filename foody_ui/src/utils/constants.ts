@@ -6,7 +6,7 @@ export const API_BASE_URL =
 export enum Routes {
   Home = "/",
   Login = "/login",
-  Signup = "/signup",
+  Register = "/register",
   Dashboard = "/dashboard",
 }
 
@@ -33,7 +33,7 @@ export enum HttpStatus {
   Unauthorized = 401,
   Forbidden = 403,
   NotFound = 404,
-  UnprocessableContent = 422,
+  UnprocessableEntity = 422,
   InternalServerError = 500,
 }
 
