@@ -1,18 +1,35 @@
 class SessionsController < ApplicationController
-  allow_unauthenticated_access only: %i[ new create ]
-  rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_session_url, alert: "Try again later." }
+  allow_unauthenticated_access only: %i[ create ]
 
+  # POST /session
   def create
-    if user = User.authenticate_by(params.permit(:email_address, :password))
-      start_new_session_for user
-      redirect_to after_authentication_url
+    permitted_params = params.permit(:email_address, :password)
+
+    # Check if required parameters are present
+    if permitted_params[:email_address].blank? || permitted_params[:password].blank?
+      render json: {
+        message: "Authentication failed",
+        errors: [ "Invalid email address or password" ]
+      }, status: :unauthorized
+      return
+    end
+
+    user = User.authenticate_by(permitted_params)
+
+    if user
+      start_new_session_for(user)
+      render json: UserBlueprint.render_as_hash(user), status: :ok
     else
-      redirect_to new_session_path, alert: "Try another email address or password."
+      render json: {
+        message: "Authentication failed",
+        errors: [ "Invalid email address or password" ]
+      }, status: :unauthorized
     end
   end
 
+  # DELETE /session
   def destroy
     terminate_session
-    redirect_to new_session_path
+    head :no_content
   end
 end
