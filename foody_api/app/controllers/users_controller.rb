@@ -1,6 +1,11 @@
 class UsersController < ApplicationController
   allow_unauthenticated_access only: %i[ create ]
 
+  # GET /me
+  def me
+    render json: UserBlueprint.render_as_hash(Current.user), status: :ok
+  end
+
   # POST /users
   def create
     user = User.new(user_params)

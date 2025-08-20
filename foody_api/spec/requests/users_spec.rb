@@ -159,4 +159,46 @@ RSpec.describe "Users", type: :request do
       end
     end
   end
+
+  describe "GET /me" do
+    context "when authenticated" do
+      let!(:user) { create(:user) }
+
+      before do
+        sign_in_as(user)
+      end
+
+      it "returns the current user data" do
+        get "/me"
+
+        expect(response).to have_http_status(:ok)
+        expect(response.content_type).to eq("application/json; charset=utf-8")
+
+        json_response = JSON.parse(response.body)
+        expect(json_response["id"]).to eq(user.id)
+        expect(json_response["email_address"]).to eq(user.email_address)
+        expect(json_response["created_at"]).to be_present
+        expect(json_response["updated_at"]).to be_present
+      end
+
+      it "returns the correct user data for the authenticated user" do
+        get "/me"
+
+        json_response = JSON.parse(response.body)
+        expect(json_response["email_address"]).to eq(user.email_address)
+      end
+    end
+
+    context "when not authenticated" do
+      it "returns unauthorized status" do
+        get "/me"
+
+        expect(response).to have_http_status(:unauthorized)
+
+        json_response = JSON.parse(response.body)
+        expect(json_response["message"]).to eq("Authentication required")
+        expect(json_response["errors"]).to include("Please log in to access this resource")
+      end
+    end
+  end
 end

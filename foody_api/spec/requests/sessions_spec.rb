@@ -101,11 +101,8 @@ RSpec.describe "Sessions", type: :request do
 
   describe "DELETE /session" do
     context "when authenticated" do
-      let!(:session) { user.sessions.create!(ip_address: "127.0.0.1", user_agent: "Test Agent") }
-
       before do
-        # Simulate authentication by manually setting Current.session
-        allow(Current).to receive(:session).and_return(session)
+        sign_in_as(user)
       end
 
       it "returns no content status" do
@@ -116,15 +113,9 @@ RSpec.describe "Sessions", type: :request do
       end
 
       it "destroys the session record" do
-        # We need to stub the authentication check but still allow the session to be destroyed
-        allow_any_instance_of(SessionsController).to receive(:resume_session).and_return(session)
-        allow(Current).to receive(:session).and_return(session)
-
         expect {
           delete "/session"
         }.to change(Session, :count).by(-1)
-
-        expect(Session.exists?(session.id)).to be false
       end
     end
 
