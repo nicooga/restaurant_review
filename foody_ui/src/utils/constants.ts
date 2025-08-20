@@ -22,6 +22,8 @@ export enum ValidationMessages {
   EmailInvalid = "Please enter a valid email address",
   PasswordMinLength = "Password must be at least 8 characters",
   PasswordMismatch = "Passwords do not match",
+  LoginFailed = "Login failed. Please check your credentials and try again.",
+  RegistrationFailed = "Registration failed. Please try again.",
 }
 
 // HTTP status codes

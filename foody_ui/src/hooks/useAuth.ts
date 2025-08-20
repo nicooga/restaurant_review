@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useLogin,
@@ -8,6 +8,7 @@ import {
 } from "../queries/auth";
 import { Routes } from "../utils/constants";
 import type { LoginCredentials, RegisterCredentials } from "../queries/auth";
+import { extractApiError } from "../types/http";
 
 export const useAuth = () => {
   const navigate = useNavigate();
@@ -69,10 +70,10 @@ export const useAuth = () => {
     isRegistering: registerMutation.isPending,
     isLoggingOut: logoutMutation.isPending,
 
-    // Error states
-    loginError: loginMutation.error,
-    registerError: registerMutation.error,
-    logoutError: logoutMutation.error,
+    // Error states with proper typing
+    loginError: extractApiError(loginMutation.error),
+    registerError: extractApiError(registerMutation.error),
+    logoutError: extractApiError(logoutMutation.error),
 
     // Reset functions
     clearLoginError: loginMutation.reset,

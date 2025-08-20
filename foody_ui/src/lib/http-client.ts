@@ -1,4 +1,5 @@
 import { API_BASE_URL, HttpStatus } from "../utils/constants";
+import type { ApiError } from "../types/http";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
@@ -15,9 +16,7 @@ interface ApiResponse<T = any> {
   statusText: string;
 }
 
-interface ApiError {
-  message: string;
-  errors?: string[];
+interface HttpApiError extends ApiError {
   status: number;
 }
 
@@ -71,7 +70,7 @@ class HttpClient {
 
       if (!response.ok) {
         // API returned an error
-        const error: ApiError = {
+        const error: HttpApiError = {
           message:
             (data as any)?.message ||
             `HTTP ${response.status}: ${response.statusText}`,
@@ -89,7 +88,7 @@ class HttpClient {
     } catch (error) {
       // Network error or JSON parsing error
       if (error instanceof Error && !(error as any).status) {
-        const apiError: ApiError = {
+        const apiError: HttpApiError = {
           message: "Network error or server unavailable",
           errors: [error.message],
           status: HttpStatus.InternalServerError,
@@ -155,4 +154,4 @@ class HttpClient {
 const httpClient = new HttpClient(API_BASE_URL);
 
 export default httpClient;
-export { HttpClient, type ApiResponse, type ApiError };
+export { HttpClient, type ApiResponse, type HttpApiError };

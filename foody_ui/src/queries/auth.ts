@@ -21,11 +21,6 @@ export interface RegisterCredentials {
   password_confirmation: string;
 }
 
-export interface AuthError {
-  message: string;
-  errors: string[];
-}
-
 // Query Keys
 const authKeys = {
   currentUser: ["auth", "currentUser"] as const,
@@ -109,12 +104,13 @@ export const useLogout = () => {
 
 // Helper hook to get auth status
 export const useAuthStatus = () => {
-  const { data: user, isLoading, isError } = useUserProfile();
+  const { data: user, isLoading, isError, error } = useUserProfile();
 
   return {
     user,
     isAuthenticated: !!user,
     isLoading,
     isError,
+    error,
   };
 };
