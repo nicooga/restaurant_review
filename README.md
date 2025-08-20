@@ -40,10 +40,21 @@ docker-compose exec foody_api rails console
 docker-compose exec foody_api rails db:migrate
 ```
 
+**Seed database:**
+```bash
+docker-compose exec foody_api rails db:seed
+```
+
 **Direct database access:**
 ```bash
 docker-compose exec postgres psql -U foody_user -d foody_development
 ```
+
+**Default test user:**
+- Email: `user@example.com`
+- Password: `password`
+
+This user is automatically created when you run `rails db:seed`.
 
 ## Development
 
