@@ -10,9 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_20_143516) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_21_152358) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "restaurants", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "cuisine_type", null: false
+    t.integer "price_range", null: false
+    t.decimal "calculated_rating", precision: 3, scale: 2, default: "0.0"
+    t.string "address"
+    t.text "description"
+    t.string "phone"
+    t.string "image_url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["calculated_rating"], name: "index_restaurants_on_calculated_rating"
+    t.index ["cuisine_type"], name: "index_restaurants_on_cuisine_type"
+    t.index ["name"], name: "index_restaurants_on_name"
+    t.index ["price_range"], name: "index_restaurants_on_price_range"
+  end
 
   create_table "sessions", force: :cascade do |t|
     t.bigint "user_id", null: false
