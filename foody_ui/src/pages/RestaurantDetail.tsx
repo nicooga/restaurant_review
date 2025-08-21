@@ -1,0 +1,341 @@
+import { useState } from "react";
+import { useLoaderData, useRevalidator, Link } from "react-router";
+import { useAuth } from "../hooks/useAuth";
+import { useCreateReview } from "../queries/restaurants";
+import { type Restaurant, type Review } from "../types/http";
+import { Routes } from "../utils/constants";
+
+interface RestaurantDetailLoaderData {
+  restaurant: Restaurant;
+  reviews: Review[];
+}
+
+function ReviewForm({ restaurantId }: { restaurantId: number }) {
+  const { user } = useAuth();
+  const revalidator = useRevalidator();
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const createReview = useCreateReview();
+
+  if (!user) {
+    return (
+      <div className="bg-gray-50 rounded-lg p-6 text-center">
+        <p className="text-gray-600 mb-4">Sign in to write a review</p>
+        <Link to={Routes.Login} className="btn-primary">
+          Sign In
+        </Link>
+      </div>
+    );
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    try {
+      await createReview.mutateAsync({
+        restaurantId,
+        reviewData: { rating, comment },
+      });
+
+      // Reset form
+      setRating(5);
+      setComment("");
+
+      // Revalidate loader data to get fresh data
+      revalidator.revalidate();
+    } catch (error) {
+      console.error("Failed to create review:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-gray-50 rounded-lg p-6">
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        Write a Review
+      </h3>
+
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Rating
+        </label>
+        <div className="flex space-x-1">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              type="button"
+              onClick={() => setRating(star)}
+              className={`text-2xl ${
+                star <= rating ? "text-yellow-400" : "text-gray-300"
+              } hover:text-yellow-400 transition-colors`}
+            >
+              ★
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Comment
+        </label>
+        <textarea
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          rows={4}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Share your experience..."
+          required
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="btn-primary w-full"
+      >
+        {isSubmitting ? "Submitting..." : "Submit Review"}
+      </button>
+    </form>
+  );
+}
+
+function ReviewCard({ review }: { review: Review }) {
+  const getRatingStars = (rating: number) => {
+    return (
+      <div className="flex items-center">
+        {[...Array(5)].map((_, i) => (
+          <span
+            key={i}
+            className={`text-sm ${
+              i < rating ? "text-yellow-400" : "text-gray-300"
+            }`}
+          >
+            ★
+          </span>
+        ))}
+      </div>
+    );
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-lg p-6">
+      <div className="flex items-start justify-between mb-3">
+        <div>
+          <div className="flex items-center space-x-2 mb-1">
+            {getRatingStars(review.rating)}
+            <span className="text-sm text-gray-600">
+              by {review.user.emailAddress}
+            </span>
+          </div>
+          <p className="text-xs text-gray-500">
+            {formatDate(review.createdAt)}
+          </p>
+        </div>
+      </div>
+
+      {review.comment && (
+        <p className="text-gray-700 leading-relaxed">{review.comment}</p>
+      )}
+    </div>
+  );
+}
+
+export function RestaurantDetail() {
+  const { restaurant, reviews } = useLoaderData() as RestaurantDetailLoaderData;
+  const { user } = useAuth();
+
+  const getPriceDisplay = (priceRange: "budget" | "moderate" | "upscale") => {
+    switch (priceRange) {
+      case "budget":
+        return "$";
+      case "moderate":
+        return "$$";
+      case "upscale":
+        return "$$$";
+      default:
+        return "$";
+    }
+  };
+
+  const getRatingStars = (rating: number) => {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+
+    return (
+      <div className="flex items-center">
+        {[...Array(5)].map((_, i) => (
+          <span
+            key={i}
+            className={`text-lg ${
+              i < fullStars
+                ? "text-yellow-400"
+                : i === fullStars && hasHalfStar
+                  ? "text-yellow-400"
+                  : "text-gray-300"
+            }`}
+          >
+            ★
+          </span>
+        ))}
+        <span className="ml-2 text-lg text-gray-600 font-medium">
+          {rating.toFixed(1)} ({reviews.length} review
+          {reviews.length !== 1 ? "s" : ""})
+        </span>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Navigation */}
+      <nav className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center space-x-4">
+              <Link to="/" className="text-xl font-semibold text-gray-900">
+                🍽️ Foody
+              </Link>
+              <Link
+                to="/"
+                className="text-blue-600 hover:text-blue-800 text-sm"
+              >
+                ← Back to Restaurants
+              </Link>
+            </div>
+            <div className="flex items-center space-x-4">
+              {user ? (
+                <span className="text-gray-700">
+                  Welcome, {user.emailAddress}
+                </span>
+              ) : (
+                <div className="space-x-2">
+                  <Link to={Routes.Login} className="btn-secondary">
+                    Sign In
+                  </Link>
+                  <Link to={Routes.Register} className="btn-primary">
+                    Sign Up
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <main className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        {/* Restaurant Header */}
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-8">
+          {restaurant.imageUrl && (
+            <img
+              src={restaurant.imageUrl}
+              alt={restaurant.name}
+              className="w-full h-64 object-cover"
+            />
+          )}
+          <div className="p-8">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  {restaurant.name}
+                </h1>
+                <div className="flex items-center space-x-4 mb-3">
+                  <span className="inline-block px-3 py-1 text-sm font-medium bg-gray-100 text-gray-800 rounded-full capitalize">
+                    {restaurant.cuisineType}
+                  </span>
+                  <span className="text-xl font-bold text-gray-700">
+                    {getPriceDisplay(restaurant.priceRange)}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              {getRatingStars(restaurant.calculatedRating)}
+            </div>
+
+            {restaurant.description && (
+              <p className="text-gray-700 mb-6 text-lg leading-relaxed">
+                {restaurant.description}
+              </p>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+              {restaurant.address && (
+                <div className="flex items-center">
+                  <span className="mr-2">📍</span>
+                  {restaurant.address}
+                </div>
+              )}
+              {restaurant.phone && (
+                <div className="flex items-center">
+                  <span className="mr-2">📞</span>
+                  {restaurant.phone}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="space-y-8">
+          {/* Review Form */}
+          <ReviewForm restaurantId={restaurant.id} />
+
+          {/* Reviews List */}
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              Reviews ({reviews.length})
+            </h2>
+
+            {reviews.length > 0 ? (
+              <div className="space-y-4">
+                {reviews.map((review) => (
+                  <ReviewCard key={review.id} review={review} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 bg-white rounded-lg">
+                <div className="text-gray-400 mb-4">
+                  <svg
+                    className="w-12 h-12 mx-auto"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.991 8.991 0 01-4.36-1.136l-3.64.364.364-3.64A8.973 8.973 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  No reviews yet
+                </h3>
+                <p className="text-gray-600">
+                  Be the first to share your experience at {restaurant.name}!
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}

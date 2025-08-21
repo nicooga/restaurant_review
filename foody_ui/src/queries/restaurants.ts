@@ -5,6 +5,8 @@ import {
   type RestaurantSearchParams,
 } from "../types/http";
 import httpClient from "../lib/http-client";
+import { type LoaderFunctionArgs } from "react-router";
+import { queryClient } from "../lib/query-client";
 
 // Query Keys
 export const restaurantKeys = {
@@ -17,6 +19,62 @@ export const restaurantKeys = {
   reviews: () => [...restaurantKeys.all, "reviews"] as const,
   restaurantReviews: (id: number) => [...restaurantKeys.reviews(), id] as const,
 };
+
+// Loader function for restaurant detail page
+export async function restaurantDetailLoader({ params }: LoaderFunctionArgs) {
+  const restaurantId = params.id;
+
+  if (!restaurantId) {
+    throw new Response("Restaurant ID is required", { status: 400 });
+  }
+
+  const id = parseInt(restaurantId, 10);
+
+  if (isNaN(id)) {
+    throw new Response("Invalid restaurant ID", { status: 400 });
+  }
+
+  try {
+    // Fetch both restaurant and reviews in parallel
+    const [restaurant, reviews] = await Promise.all([
+      queryClient.fetchQuery({
+        queryKey: restaurantKeys.detail(id),
+        queryFn: async () => {
+          const response = await httpClient.get<Restaurant>(
+            `/restaurants/${id}`,
+          );
+          return response.data;
+        },
+        staleTime: 10 * 60 * 1000, // 10 minutes
+      }),
+      queryClient.fetchQuery({
+        queryKey: restaurantKeys.restaurantReviews(id),
+        queryFn: async () => {
+          const response = await httpClient.get<Review[]>(
+            `/restaurants/${id}/reviews`,
+          );
+          return response.data;
+        },
+        staleTime: 2 * 60 * 1000, // 2 minutes
+      }),
+    ]);
+
+    return { restaurant, reviews };
+  } catch (error) {
+    // Handle 404 for restaurant not found
+    if (
+      error &&
+      typeof error === "object" &&
+      "status" in error &&
+      error.status === 404
+    ) {
+      throw new Response("Restaurant not found", { status: 404 });
+    }
+
+    // Re-throw other errors
+    throw error;
+  }
+}
 
 // Helper function to format search params for API
 function formatSearchParams(params: RestaurantSearchParams): URLSearchParams {

@@ -8,7 +8,13 @@ export enum Routes {
   Login = "/login",
   Register = "/register",
   Dashboard = "/dashboard",
+  RestaurantDetail = "/restaurants/:id",
 }
+
+// Helper functions for route generation
+export const generateRoutes = {
+  restaurantDetail: (id: number) => `/restaurants/${id}`,
+};
 
 // Local storage keys
 export enum StorageKeys {

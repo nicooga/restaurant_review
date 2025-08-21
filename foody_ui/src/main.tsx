@@ -1,15 +1,18 @@
+import "./index.css";
+
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import "./index.css";
 import { queryClient } from "./lib/query-client";
 
 // Import route components
 import { LoginForm } from "./components/auth/LoginForm";
 import { RegisterForm } from "./components/auth/RegisterForm";
 import { Restaurants } from "./pages/Restaurants";
+import { RestaurantDetail } from "./pages/RestaurantDetail";
+import { restaurantDetailLoader } from "./queries/restaurants";
 import { Routes } from "./utils/constants";
 
 // Create router configuration
@@ -37,6 +40,11 @@ const router = createBrowserRouter([
   {
     path: Routes.Dashboard,
     element: <Restaurants />,
+  },
+  {
+    path: "/restaurants/:id",
+    element: <RestaurantDetail />,
+    loader: restaurantDetailLoader,
   },
   {
     path: "*",

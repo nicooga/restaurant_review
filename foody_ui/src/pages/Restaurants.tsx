@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useSearchParams } from "react-router";
+import { useSearchParams, Link } from "react-router";
 import { useAuth } from "../hooks/useAuth";
 import { useRestaurants } from "../queries/restaurants";
 import {
@@ -7,6 +7,7 @@ import {
   type RestaurantSearchParams,
   type RestaurantSort,
 } from "../types/http";
+import { generateRoutes } from "../utils/constants";
 
 const CUISINE_TYPES = [
   { value: "", label: "All Cuisines" },
@@ -117,9 +118,19 @@ function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
         )}
 
         <div className="flex gap-2">
-          <button className="btn-secondary flex-1 text-sm">View Details</button>
+          <Link
+            to={generateRoutes.restaurantDetail(restaurant.id)}
+            className="btn-secondary flex-1 text-sm text-center"
+          >
+            View Details
+          </Link>
           {user ? (
-            <button className="btn-primary flex-1 text-sm">Write Review</button>
+            <Link
+              to={generateRoutes.restaurantDetail(restaurant.id)}
+              className="btn-primary flex-1 text-sm text-center"
+            >
+              Write Review
+            </Link>
           ) : (
             <button
               className="btn-outline flex-1 text-sm"
