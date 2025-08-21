@@ -8,6 +8,8 @@ import {
   type RestaurantSort,
 } from "../types/http";
 import { generateRoutes } from "../utils/constants";
+import { ReviewModal } from "../components/reviews/ReviewModal";
+import { useDisclosure } from "../hooks/useDisclosure";
 
 const CUISINE_TYPES = [
   { value: "", label: "All Cuisines" },
@@ -39,7 +41,11 @@ const SORT_OPTIONS = [
 ];
 
 function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
-  const { user } = useAuth();
+  const {
+    isOpen: isReviewModalOpen,
+    onOpen: openReviewModal,
+    onClose: closeReviewModal,
+  } = useDisclosure();
 
   const getPriceDisplay = (priceRange: "budget" | "moderate" | "upscale") => {
     switch (priceRange) {
@@ -122,22 +128,20 @@ function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
           >
             View Details
           </Link>
-          {user ? (
-            <Link
-              to={generateRoutes.restaurantDetail(restaurant.id)}
-              className="btn-primary flex-1 text-sm text-center"
-            >
-              Write Review
-            </Link>
-          ) : (
-            <button
-              className="btn-outline flex-1 text-sm"
-              onClick={() => (window.location.href = "/login")}
-            >
-              Sign In to Review
-            </button>
-          )}
+          <button
+            onClick={openReviewModal}
+            className="btn-primary flex-1 text-sm"
+          >
+            Write Review
+          </button>
         </div>
+
+        <ReviewModal
+          isOpen={isReviewModalOpen}
+          onClose={closeReviewModal}
+          restaurantId={restaurant.id}
+          restaurantName={restaurant.name}
+        />
       </div>
     </div>
   );

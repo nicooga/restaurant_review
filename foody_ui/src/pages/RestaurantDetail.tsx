@@ -1,107 +1,47 @@
-import { useState } from "react";
-import { useLoaderData, useRevalidator, Link } from "react-router";
+import { useLoaderData, Link } from "react-router";
 import { useAuth } from "../hooks/useAuth";
-import { useCreateReview } from "../queries/restaurants";
 import { type Restaurant, type Review } from "../types/http";
 import { Routes } from "../utils/constants";
+import { ReviewModal } from "../components/reviews/ReviewModal";
+import { useDisclosure } from "../hooks/useDisclosure";
 
 interface RestaurantDetailLoaderData {
   restaurant: Restaurant;
   reviews: Review[];
 }
 
-function ReviewForm({ restaurantId }: { restaurantId: number }) {
-  const { user } = useAuth();
-  const revalidator = useRevalidator();
-  const [rating, setRating] = useState(5);
-  const [comment, setComment] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const createReview = useCreateReview();
-
-  if (!user) {
-    return (
-      <div className="bg-gray-50 rounded-lg p-6 text-center">
-        <p className="text-gray-600 mb-4">Sign in to write a review</p>
-        <Link to={Routes.Login} className="btn-primary">
-          Sign In
-        </Link>
-      </div>
-    );
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (isSubmitting) return;
-
-    setIsSubmitting(true);
-    try {
-      await createReview.mutateAsync({
-        restaurantId,
-        reviewData: { rating, comment },
-      });
-
-      // Reset form
-      setRating(5);
-      setComment("");
-
-      // Revalidate loader data to get fresh data
-      revalidator.revalidate();
-    } catch (error) {
-      console.error("Failed to create review:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+function ReviewButton({
+  restaurantId,
+  restaurantName,
+}: {
+  restaurantId: number;
+  restaurantName: string;
+}) {
+  const {
+    isOpen: isReviewModalOpen,
+    onOpen: openReviewModal,
+    onClose: closeReviewModal,
+  } = useDisclosure();
 
   return (
-    <form onSubmit={handleSubmit} className="bg-gray-50 rounded-lg p-6">
+    <div className="bg-gray-50 rounded-lg p-6 text-center">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">
         Write a Review
       </h3>
-
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Rating
-        </label>
-        <div className="flex space-x-1">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <button
-              key={star}
-              type="button"
-              onClick={() => setRating(star)}
-              className={`text-2xl ${
-                star <= rating ? "text-yellow-400" : "text-gray-300"
-              } hover:text-yellow-400 transition-colors`}
-            >
-              ★
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Comment
-        </label>
-        <textarea
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          rows={4}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Share your experience..."
-          required
-        />
-      </div>
-
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="btn-primary w-full"
-      >
-        {isSubmitting ? "Submitting..." : "Submit Review"}
+      <p className="text-gray-600 mb-4">
+        Share your experience with other diners
+      </p>
+      <button onClick={openReviewModal} className="btn-primary">
+        Write Review
       </button>
-    </form>
+
+      <ReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={closeReviewModal}
+        restaurantId={restaurantId}
+        restaurantName={restaurantName}
+      />
+    </div>
   );
 }
 
@@ -293,8 +233,11 @@ export function RestaurantDetail() {
 
         {/* Reviews Section */}
         <div className="space-y-8">
-          {/* Review Form */}
-          <ReviewForm restaurantId={restaurant.id} />
+          {/* Review Button */}
+          <ReviewButton
+            restaurantId={restaurant.id}
+            restaurantName={restaurant.name}
+          />
 
           {/* Reviews List */}
           <div>

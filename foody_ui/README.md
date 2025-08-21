@@ -1,69 +1,163 @@
-# React + TypeScript + Vite
+# Foody UI - React Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern React + TypeScript + Vite application for the Foody restaurant review platform.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React 18** - UI framework
+- **TypeScript** - Type safety
+- **Vite** - Build tool and dev server
+- **TanStack Query** - Server state management
+- **React Router** - Client-side routing
+- **React Hook Form** - Form validation
+- **Tailwind CSS** - Styling
 
-## Expanding the ESLint configuration
+## Development Setup
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Prerequisites
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Node.js 20+
+- Docker & Docker Compose
+- npm
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### Getting Started
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+#### Option 1: Docker Development (Recommended)
+
+1. Start all services:
+```bash
+docker-compose up -d
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. The UI will be available at `http://localhost:5173`
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+#### Option 2: Local Development
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Start the development server:
+```bash
+npm run dev
+```
+
+3. Make sure the API is running (via Docker or locally)
+
+## 🚨 Important: Adding New Dependencies
+
+When adding new npm packages in a Docker environment, follow these steps to avoid architecture conflicts:
+
+### Installing New Packages
+
+1. **Add the package to package.json** or install locally first:
+```bash
+npm install package-name
+```
+
+2. **Reinstall dependencies in Docker container**:
+```bash
+docker-compose run -T --rm foody_ui sh -c "rm -rf node_modules package-lock.json && npm install"
+```
+
+3. **Restart the container**:
+```bash
+docker-compose restart foody_ui
+```
+
+### Why This Is Necessary
+
+Docker containers may use different CPU architectures than your host machine. When you install packages locally and then run in Docker, some native binaries (like those used by Vite, Rollup, etc.) may be incompatible.
+
+The solution ensures dependencies are installed with the correct architecture inside the container.
+
+### Common Error Signs
+
+If you see errors like:
+- `Cannot find module @rollup/rollup-linux-arm64-musl`
+- `Failed to resolve import "package-name"`
+- Architecture-related binary errors
+
+Run the dependency reinstall command above.
+
+## Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+- `npm run lint:fix` - Fix ESLint issues
+
+## Project Structure
+
+```
+src/
+├── components/          # Reusable UI components
+│   ├── auth/           # Authentication components
+│   ├── common/         # Generic components (Modal, Portal, etc.)
+│   └── reviews/        # Review-specific components
+├── hooks/              # Custom React hooks
+├── lib/                # Utilities and configurations
+├── pages/              # Page components (routes)
+├── queries/            # TanStack Query hooks
+├── types/              # TypeScript type definitions
+└── utils/              # Helper functions and constants
+```
+
+## Key Features
+
+- **Authentication Flow** - Login/register with session persistence
+- **Restaurant Browsing** - Search, filter, and sort restaurants
+- **Review System** - Write and read reviews with modal interface
+- **Responsive Design** - Mobile-first Tailwind CSS
+- **Type Safety** - Full TypeScript coverage
+- **Query Management** - Efficient data fetching and caching
+
+## API Integration
+
+The frontend communicates with the Rails API running on `http://localhost:3000`. CORS is configured to allow requests from the Vite dev server.
+
+Key API endpoints:
+- `POST /session` - Login
+- `GET /me` - Get current user
+- `GET /restaurants` - List restaurants with filters
+- `GET /restaurants/:id` - Get restaurant details
+- `POST /restaurants/:id/reviews` - Create review
+
+## Environment Variables
+
+Create a `.env` file:
+
+```env
+VITE_API_URL=http://localhost:3000
+```
+
+## Troubleshooting
+
+### Container Won't Start
+
+1. Check if ports are available:
+```bash
+lsof -i :5173
+```
+
+2. Rebuild containers:
+```bash
+docker-compose down
+docker-compose build --no-cache foody_ui
+docker-compose up -d
+```
+
+### Module Resolution Errors
+
+This usually indicates a dependency architecture mismatch. Follow the dependency installation steps above.
+
+### Hot Reload Not Working
+
+Make sure file watching is enabled in Docker:
+```yaml
+# In docker-compose.yml
+volumes:
+  - ./foody_ui:/app
 ```

@@ -63,6 +63,40 @@ All source code is mounted into the containers, so any changes you make will be 
 - Rails API changes are picked up automatically
 - React changes trigger hot reload in the browser
 
+## Dependency Management
+
+### Adding New Dependencies
+
+When adding new dependencies in Docker, follow these steps to avoid architecture conflicts:
+
+**For Frontend (npm packages):**
+```bash
+# 1. Add package to package.json or install locally
+npm install package-name
+
+# 2. Reinstall in Docker container to fix architecture conflicts
+docker-compose run -T --rm foody_ui sh -c "rm -rf node_modules package-lock.json && npm install"
+
+# 3. Restart the container
+docker-compose restart foody_ui
+```
+
+**For Backend (Ruby gems):**
+```bash
+# 1. Add gem to Gemfile
+echo 'gem "gem-name"' >> foody_api/Gemfile
+
+# 2. Rebuild container to install new gems
+docker-compose build --no-cache foody_api
+
+# 3. Restart the container
+docker-compose restart foody_api
+```
+
+### Why This Is Important
+
+Docker containers may use different CPU architectures than your host machine. Installing packages locally then running in Docker can cause native binary conflicts, especially with build tools like Vite, Rollup, and native Ruby extensions.
+
 ## Common Commands
 
 ```bash
@@ -76,11 +110,12 @@ docker-compose restart foody_api
 docker-compose logs foody_api
 docker-compose logs foody_ui
 
-# Install new gems
-docker-compose exec foody_api bundle install
+# Rails console
+docker-compose exec foody_api rails console
 
-# Install new npm packages
-docker-compose exec foody_ui npm install package-name
+# Install dependencies (use methods above for new packages)
+docker-compose exec foody_api bundle install
+docker-compose exec foody_ui npm install
 ```
 
 ## Project Structure
