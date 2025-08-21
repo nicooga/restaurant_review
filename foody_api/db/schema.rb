@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_21_152358) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_21_153326) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -31,6 +31,21 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_21_152358) do
     t.index ["price_range"], name: "index_restaurants_on_price_range"
   end
 
+  create_table "reviews", force: :cascade do |t|
+    t.integer "rating", null: false
+    t.text "comment", null: false
+    t.bigint "user_id", null: false
+    t.bigint "restaurant_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["rating"], name: "index_reviews_on_rating"
+    t.index ["restaurant_id", "created_at"], name: "index_reviews_on_restaurant_id_and_created_at"
+    t.index ["restaurant_id", "user_id"], name: "index_reviews_on_restaurant_id_and_user_id", unique: true
+    t.index ["restaurant_id"], name: "index_reviews_on_restaurant_id"
+    t.index ["user_id", "created_at"], name: "index_reviews_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_reviews_on_user_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "ip_address"
@@ -48,5 +63,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_21_152358) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "reviews", "restaurants"
+  add_foreign_key "reviews", "users"
   add_foreign_key "sessions", "users"
 end

@@ -18,8 +18,7 @@ RSpec.describe Restaurant, type: :model do
   let(:restaurant) { build(:restaurant, valid_attributes) }
 
   describe "associations" do
-    # TODO: Uncomment when Review model is created
-    # it { is_expected.to have_many(:reviews).dependent(:destroy) }
+    it { is_expected.to have_many(:reviews).dependent(:destroy) }
   end
 
   describe "enums" do
