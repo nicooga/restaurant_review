@@ -41,8 +41,6 @@ const SORT_OPTIONS = [
 function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
   const { user } = useAuth();
 
-  console.log({ restaurant });
-
   const getPriceDisplay = (priceRange: "budget" | "moderate" | "upscale") => {
     switch (priceRange) {
       case "budget":
