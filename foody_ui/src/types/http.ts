@@ -131,3 +131,53 @@ export function getAllErrorMessages(error: ApiError | null): string[] {
 
   return messages;
 }
+
+// Restaurant and Review Types
+export interface User {
+  id: number;
+  emailAddress: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Restaurant {
+  id: number;
+  name: string;
+  cuisineType: string;
+  priceRange: "budget" | "moderate" | "upscale";
+  calculatedRating: number;
+  address?: string;
+  description?: string;
+  phone?: string;
+  imageUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Review {
+  id: number;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  updatedAt: string;
+  user: User;
+  restaurant?: Restaurant;
+}
+
+// Filter and Sort Types
+export interface RestaurantFilters {
+  name?: string;
+  cuisineType?: string;
+  maxPrice?: 1 | 2 | 3;
+  minRating?: number;
+}
+
+export interface RestaurantSort {
+  by?: "name" | "rating" | "priceRange" | "createdAt";
+  direction?: "asc" | "desc";
+}
+
+export interface RestaurantSearchParams {
+  filters?: RestaurantFilters;
+  sort?: RestaurantSort;
+}

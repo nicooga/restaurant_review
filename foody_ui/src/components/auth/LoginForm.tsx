@@ -12,7 +12,7 @@ interface LoginFormProps {
 export const LoginForm = ({ onSwitchToRegister }: LoginFormProps) => {
   const navigate = useNavigate();
   const [credentials, setCredentials] = useState<LoginCredentials>({
-    email_address: "",
+    emailAddress: "",
     password: "",
   });
 
@@ -56,8 +56,8 @@ export const LoginForm = ({ onSwitchToRegister }: LoginFormProps) => {
           <input
             id="email"
             type="email"
-            value={credentials.email_address}
-            onChange={(e) => handleInputChange("email_address", e.target.value)}
+            value={credentials.emailAddress}
+            onChange={(e) => handleInputChange("emailAddress", e.target.value)}
             className="input-field"
             placeholder="Enter your email"
             required

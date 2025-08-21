@@ -12,9 +12,9 @@ interface RegisterFormProps {
 export const RegisterForm = ({ onSwitchToLogin }: RegisterFormProps) => {
   const navigate = useNavigate();
   const [credentials, setCredentials] = useState<RegisterCredentials>({
-    email_address: "",
+    emailAddress: "",
     password: "",
-    password_confirmation: "",
+    passwordConfirmation: "",
   });
 
   const { register, isRegistering, registerError, clearRegisterError } =
@@ -63,8 +63,8 @@ export const RegisterForm = ({ onSwitchToLogin }: RegisterFormProps) => {
           <input
             id="email"
             type="email"
-            value={credentials.email_address}
-            onChange={(e) => handleInputChange("email_address", e.target.value)}
+            value={credentials.emailAddress}
+            onChange={(e) => handleInputChange("emailAddress", e.target.value)}
             className="input-field"
             placeholder="Enter your email"
             required
@@ -101,9 +101,9 @@ export const RegisterForm = ({ onSwitchToLogin }: RegisterFormProps) => {
           <input
             id="password_confirmation"
             type="password"
-            value={credentials.password_confirmation}
+            value={credentials.passwordConfirmation}
             onChange={(e) =>
-              handleInputChange("password_confirmation", e.target.value)
+              handleInputChange("passwordConfirmation", e.target.value)
             }
             className="input-field"
             placeholder="Confirm your password"

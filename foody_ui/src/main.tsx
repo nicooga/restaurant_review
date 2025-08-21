@@ -9,19 +9,14 @@ import { queryClient } from "./lib/query-client";
 // Import route components
 import { LoginForm } from "./components/auth/LoginForm";
 import { RegisterForm } from "./components/auth/RegisterForm";
-import { Dashboard } from "./pages/Dashboard";
-import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { Restaurants } from "./pages/Restaurants";
 import { Routes } from "./utils/constants";
 
 // Create router configuration
 const router = createBrowserRouter([
   {
     path: "/",
-    element: (
-      <ProtectedRoute>
-        <Dashboard />
-      </ProtectedRoute>
-    ),
+    element: <Restaurants />,
   },
   {
     path: Routes.Login,
@@ -41,11 +36,7 @@ const router = createBrowserRouter([
   },
   {
     path: Routes.Dashboard,
-    element: (
-      <ProtectedRoute>
-        <Dashboard />
-      </ProtectedRoute>
-    ),
+    element: <Restaurants />,
   },
   {
     path: "*",

@@ -28,6 +28,7 @@ class HttpClient {
     this.baseURL = baseURL.replace(/\/$/, "");
     this.defaultHeaders = {
       "Content-Type": "application/json",
+      "Key-Inflection": "camel",
     };
   }
 

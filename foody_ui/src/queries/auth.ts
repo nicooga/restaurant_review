@@ -1,24 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import httpClient from "../lib/http-client";
 import { HttpStatus, StaleTime } from "../utils/constants";
+import { type User } from "../types/http";
 
 // Auth Types
-export interface User {
-  id: number;
-  email_address: string;
-  created_at: string;
-  updated_at: string;
-}
-
 export interface LoginCredentials {
-  email_address: string;
+  emailAddress: string;
   password: string;
 }
 
 export interface RegisterCredentials {
-  email_address: string;
+  emailAddress: string;
   password: string;
-  password_confirmation: string;
+  passwordConfirmation: string;
 }
 
 // Query Keys

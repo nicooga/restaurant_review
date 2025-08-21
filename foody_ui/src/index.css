@@ -30,4 +30,15 @@
     .card {
         @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
     }
+
+    .btn-outline {
+        @apply bg-transparent hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg border border-gray-300 transition-colors duration-200;
+    }
+
+    .line-clamp-2 {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
 }
