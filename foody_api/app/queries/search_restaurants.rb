@@ -1,4 +1,4 @@
-class RestaurantIndexQuery
+class SearchRestaurants
   def self.call(params = {})
     new(params).call
   end
