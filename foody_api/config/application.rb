@@ -29,6 +29,10 @@ module FoodyApi
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
 
+    # Add session middleware for API mode (needed for authentication cookies)
+    config.middleware.use ActionDispatch::Cookies
+    config.middleware.use ActionDispatch::Session::CookieStore
+
     # Configure OliveBranch for automatic case conversion
     config.middleware.use OliveBranch::Middleware
   end
