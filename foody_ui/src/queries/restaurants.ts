@@ -35,8 +35,8 @@ export async function restaurantDetailLoader({ params }: LoaderFunctionArgs) {
   }
 
   try {
-    // Fetch both restaurant and reviews in parallel
-    const [restaurant, reviews] = await Promise.all([
+    // Preload both restaurant and reviews data
+    await Promise.all([
       queryClient.fetchQuery({
         queryKey: restaurantKeys.detail(id),
         queryFn: async () => {
@@ -59,7 +59,8 @@ export async function restaurantDetailLoader({ params }: LoaderFunctionArgs) {
       }),
     ]);
 
-    return { restaurant, reviews };
+    // Return the ID so the component can use it
+    return { restaurantId: id };
   } catch (error) {
     // Handle 404 for restaurant not found
     if (

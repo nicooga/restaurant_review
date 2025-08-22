@@ -1,14 +1,10 @@
-import { useLoaderData, Link } from "react-router";
+import { useParams, Link } from "react-router";
 import { useAuth } from "../hooks/useAuth";
-import { type Restaurant, type Review } from "../types/http";
+import { useRestaurant, useRestaurantReviews } from "../queries/restaurants";
+import { type Review } from "../types/http";
 import { Routes } from "../utils/constants";
 import { ReviewModal } from "../components/reviews/ReviewModal";
 import { useDisclosure } from "../hooks/useDisclosure";
-
-interface RestaurantDetailLoaderData {
-  restaurant: Restaurant;
-  reviews: Review[];
-}
 
 function ReviewButton({
   restaurantId,
@@ -91,8 +87,18 @@ function ReviewCard({ review }: { review: Review }) {
 }
 
 export function RestaurantDetail() {
-  const { restaurant, reviews } = useLoaderData() as RestaurantDetailLoaderData;
+  const params = useParams();
+  const restaurantId = parseInt(params.id!, 10);
+
+  // Data is preloaded by the router loader, so we can access it directly
+  const { data: restaurant } = useRestaurant(restaurantId);
+  const { data: reviews } = useRestaurantReviews(restaurantId);
   const { user } = useAuth();
+
+  // Since data is preloaded, restaurant and reviews should always be available
+  if (!restaurant || !reviews) {
+    return null; // This should rarely happen since loader handles errors
+  }
 
   const getPriceDisplay = (priceRange: "budget" | "moderate" | "upscale") => {
     switch (priceRange) {
