@@ -1,6 +1,6 @@
 # Foody - Interview Starting Point
 
-This is a simple development environment for building a food delivery application. It includes a Rails API backend, React frontend, and PostgreSQL database, all running in Docker containers.
+This is a simple development environment for building a restaurant review application. It includes a Rails API backend, React frontend, and PostgreSQL database, all running in Docker containers.
 
 The Docker containers are provided as a convenience so you do not need to install any dependencies. However, you can also run the applications directly on your machine if you prefer.
 
