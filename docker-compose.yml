@@ -30,6 +30,7 @@ services:
       - "5173:5173"
     volumes:
       - ./foody_ui:/app
+      - /foody_ui/node_modules
 
 volumes:
   postgres_data:

@@ -16,7 +16,7 @@ The Docker containers are provided as a convenience so you do not need to instal
    - **Backend (Rails API):** http://localhost:3000
    - **Database (PostgreSQL):** localhost:5432
 
-That's it! All services will start automatically and the database will be created.
+That's it! All services will start automatically and the database will be created. **Database migrations and seeding will run automatically** on the first startup, so you'll have sample data ready to use immediately.
 
 ## What's Included
 
@@ -46,6 +46,8 @@ docker-compose exec foody_api rails db:migrate
 ```bash
 docker-compose exec foody_api rails db:seed
 ```
+
+> **Note:** Migrations and seeding happen automatically when the API container starts, so you typically don't need to run these commands manually.
 
 **Direct database access:**
 ```bash
