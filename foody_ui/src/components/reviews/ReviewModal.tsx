@@ -1,3 +1,4 @@
+import { useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useCreateReview } from "../../queries/restaurants";
 import { useAuth } from "../../hooks/useAuth";
@@ -46,35 +47,35 @@ export function ReviewModal({
     },
   });
 
-  const handleAfterClose = () => {
-    reset();
-  };
-
-  const onSubmit = async (data: ReviewFormData) => {
-    try {
-      await createReview.mutateAsync({
-        restaurantId,
-        reviewData: {
-          rating: Number(data.rating),
-          comment: data.comment,
-        },
-      });
-      onClose();
-    } catch (error) {
-      console.error("Failed to create review:", error);
+  // Reset form when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      reset();
     }
-  };
+  }, [isOpen, reset]);
+
+  const onSubmit = useCallback(
+    async (data: ReviewFormData) => {
+      try {
+        await createReview.mutateAsync({
+          restaurantId,
+          reviewData: {
+            rating: Number(data.rating),
+            comment: data.comment,
+          },
+        });
+        onClose();
+      } catch (error) {
+        console.error("Failed to create review:", error);
+      }
+    },
+    [createReview, restaurantId, onClose],
+  );
 
   // Show login prompt for unauthenticated users
   if (!user) {
     return (
-      <Modal
-        isOpen={isOpen}
-        onClose={onClose}
-        onAfterClose={handleAfterClose}
-        size="md"
-        isCentered
-      >
+      <Modal isOpen={isOpen} onClose={onClose} size="md" isCentered>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Sign In Required</ModalHeader>
@@ -98,13 +99,7 @@ export function ReviewModal({
   }
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      onAfterClose={handleAfterClose}
-      size="lg"
-      isCentered
-    >
+    <Modal isOpen={isOpen} onClose={onClose} size="lg" isCentered>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Write a Review</ModalHeader>

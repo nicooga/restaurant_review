@@ -12,6 +12,6 @@ class CreateReviews < ActiveRecord::Migration[8.0]
     add_index :reviews, :rating
     add_index :reviews, [:restaurant_id, :created_at]
     add_index :reviews, [:user_id, :created_at]
-    add_index :reviews, [:restaurant_id, :user_id], unique: true
+    add_index :reviews, [:restaurant_id, :user_id]
   end
 end

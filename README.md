@@ -2,6 +2,8 @@
 
 This is a simple development environment for building a food delivery application. It includes a Rails API backend, React frontend, and PostgreSQL database, all running in Docker containers.
 
+The Docker containers are provided as a convenience so you do not need to install any dependencies. However, you can also run the applications directly on your machine if you prefer.
+
 ## Quick Start
 
 1. **Start the application:**
@@ -19,7 +21,7 @@ That's it! All services will start automatically and the database will be create
 ## What's Included
 
 - **Rails API** (`foody_api/`) - Ruby on Rails API server on port 3000
-- **React Frontend** (`foody_ui/`) - React + TypeScript + Vite on port 5173  
+- **React Frontend** (`foody_ui/`) - React + TypeScript + Vite on port 5173
 - **PostgreSQL Database** - Running on port 5432
 
 ## Database Access

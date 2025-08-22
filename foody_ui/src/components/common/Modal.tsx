@@ -27,7 +27,6 @@ function useModalContext() {
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAfterClose?: () => void;
   children: ReactNode;
   closeOnOverlayClick?: boolean;
   closeOnEsc?: boolean;
@@ -79,9 +78,8 @@ const sizeClasses = {
 function useModal({
   isOpen,
   onClose,
-  onAfterClose,
   closeOnEsc = true,
-}: Pick<ModalProps, "isOpen" | "onClose" | "onAfterClose" | "closeOnEsc">) {
+}: Pick<ModalProps, "isOpen" | "onClose" | "closeOnEsc">) {
   const lastActiveElement = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -100,14 +98,9 @@ function useModal({
         if (lastActiveElement.current) {
           lastActiveElement.current.focus();
         }
-
-        // Call onAfterClose after cleanup is done
-        if (onAfterClose) {
-          onAfterClose();
-        }
       };
     }
-  }, [isOpen, onAfterClose]);
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen || !closeOnEsc) return;
@@ -127,36 +120,35 @@ function useModal({
 export function Modal({
   isOpen,
   onClose,
-  onAfterClose,
   children,
   closeOnOverlayClick = true,
   closeOnEsc = true,
   isCentered = false,
   size = "md",
 }: ModalProps) {
-  useModal({ isOpen, onClose, onAfterClose, closeOnEsc });
+  useModal({ isOpen, onClose, closeOnEsc });
 
   if (!isOpen) return null;
 
-  const modalContent = (
-    <ModalContext.Provider value={{ isOpen, onClose }}>
-      <div
-        className={`fixed inset-0 z-50 flex ${
-          isCentered ? "items-center" : "items-start pt-16"
-        } justify-center p-4`}
-        onClick={closeOnOverlayClick ? onClose : undefined}
-      >
+  return (
+    <Portal>
+      <ModalContext.Provider value={{ isOpen, onClose }}>
         <div
-          className={`w-full ${sizeClasses[size]} relative`}
-          onClick={(e) => e.stopPropagation()}
+          className={`fixed inset-0 z-50 flex ${
+            isCentered ? "items-center" : "items-start pt-16"
+          } justify-center p-4`}
+          onClick={closeOnOverlayClick ? onClose : undefined}
         >
-          {children}
+          <div
+            className={`w-full ${sizeClasses[size]} relative`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {children}
+          </div>
         </div>
-      </div>
-    </ModalContext.Provider>
+      </ModalContext.Provider>
+    </Portal>
   );
-
-  return <Portal>{modalContent}</Portal>;
 }
 
 // Modal Overlay Component

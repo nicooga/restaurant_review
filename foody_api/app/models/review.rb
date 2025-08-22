@@ -11,7 +11,7 @@ class Review < ApplicationRecord
               less_than_or_equal_to: 5
             }
   validates :comment, presence: true, length: { minimum: 10, maximum: 1000 }
-  validates :user_id, uniqueness: { scope: :restaurant_id, message: "can only review a restaurant once" }
+
 
   # Scopes
   scope :by_rating, ->(rating) { where(rating: rating) if rating.present? }

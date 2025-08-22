@@ -41,11 +41,7 @@ const SORT_OPTIONS = [
 ];
 
 function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
-  const {
-    isOpen: isReviewModalOpen,
-    onOpen: openReviewModal,
-    onClose: closeReviewModal,
-  } = useDisclosure();
+  const modal = useDisclosure();
 
   const getPriceDisplay = (priceRange: "budget" | "moderate" | "upscale") => {
     switch (priceRange) {
@@ -128,17 +124,14 @@ function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
           >
             View Details
           </Link>
-          <button
-            onClick={openReviewModal}
-            className="btn-primary flex-1 text-sm"
-          >
+          <button onClick={modal.onOpen} className="btn-primary flex-1 text-sm">
             Write Review
           </button>
         </div>
 
         <ReviewModal
-          isOpen={isReviewModalOpen}
-          onClose={closeReviewModal}
+          isOpen={modal.isOpen}
+          onClose={modal.onClose}
           restaurantId={restaurant.id}
           restaurantName={restaurant.name}
         />

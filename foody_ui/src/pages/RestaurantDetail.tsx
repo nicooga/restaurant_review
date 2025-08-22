@@ -17,11 +17,7 @@ function ReviewButton({
   restaurantId: number;
   restaurantName: string;
 }) {
-  const {
-    isOpen: isReviewModalOpen,
-    onOpen: openReviewModal,
-    onClose: closeReviewModal,
-  } = useDisclosure();
+  const modal = useDisclosure();
 
   return (
     <div className="bg-gray-50 rounded-lg p-6 text-center">
@@ -31,13 +27,13 @@ function ReviewButton({
       <p className="text-gray-600 mb-4">
         Share your experience with other diners
       </p>
-      <button onClick={openReviewModal} className="btn-primary">
+      <button onClick={modal.onOpen} className="btn-primary">
         Write Review
       </button>
 
       <ReviewModal
-        isOpen={isReviewModalOpen}
-        onClose={closeReviewModal}
+        isOpen={modal.isOpen}
+        onClose={modal.onClose}
         restaurantId={restaurantId}
         restaurantName={restaurantName}
       />
