@@ -9,35 +9,18 @@ A Ruby on Rails API server for the Foody restaurant review platform, providing a
 - **PostgreSQL** - Database
 - **Blueprinter** - JSON serialization
 - **OliveBranch** - Automatic case conversion (snake_case ↔ camelCase)
-- **Docker** - Containerization
 
-## Development Setup
+## Local Development Setup
 
 ### Prerequisites
 
-- Docker & Docker Compose
-- Ruby 3.4.5 (if running locally)
-- PostgreSQL (if running locally)
+- Ruby 3.4.5
+- PostgreSQL
+- Bundler
 
 ### Getting Started
 
-#### Option 1: Docker Development (Recommended)
-
-1. Start all services:
-```bash
-docker-compose up -d
-```
-
-2. Set up the database:
-```bash
-docker-compose exec foody_api rails db:create db:migrate db:seed
-```
-
-3. The API will be available at `http://localhost:3000`
-
-#### Option 2: Local Development
-
-1. Install Ruby dependencies:
+1. Install dependencies:
 ```bash
 bundle install
 ```
@@ -52,49 +35,17 @@ rails db:create db:migrate db:seed
 rails server
 ```
 
-## 🚨 Important: Adding New Gems
+The API will be available at `http://localhost:3000`
 
-When adding new Ruby gems in a Docker environment, follow these steps:
-
-### Installing New Gems
-
-The correct way to add gems in Docker containers:
+## Adding New Gems
 
 ```bash
-# Add gem using bundle add (updates both Gemfile and Gemfile.lock)
-docker-compose exec foody_api bundle add gem-name
+# Add a new gem
+bundle add gem-name
 
-# Restart the container to load the new gem
-docker-compose restart foody_api
+# Or edit Gemfile manually and run:
+bundle install
 ```
-
-**Why this works**: `bundle add` properly updates both `Gemfile` and `Gemfile.lock` files, which sync to your host machine via Docker volume mounting.
-
-### Alternative: Manual Gemfile editing + rebuild
-
-If you prefer to edit the Gemfile manually:
-
-```bash
-# 1. Add gem to Gemfile manually
-echo 'gem "gem-name"' >> foody_api/Gemfile
-
-# 2. Rebuild the container to install the gem
-docker-compose build --no-cache foody_api
-
-# 3. Restart the container
-docker-compose restart foody_api
-```
-
-### Why `bundle add` Is Recommended
-
-Docker containers have isolated gem environments, but volume mounting allows file synchronization. The `bundle add` command:
-
-- ✅ **Updates both files**: Modifies both `Gemfile` and `Gemfile.lock` 
-- ✅ **Syncs to host**: Changes appear on your local machine via volume mounting
-- ✅ **No rebuild needed**: Gems are installed immediately in the running container
-- ✅ **Proper dependency resolution**: Bundler handles version conflicts automatically
-
-Manual `bundle install` after editing `Gemfile` can have sync issues with Docker volumes.
 
 ## Database Management
 
@@ -102,33 +53,33 @@ Manual `bundle install` after editing `Gemfile` can have sync issues with Docker
 
 ```bash
 # Create a new migration
-docker-compose exec foody_api rails generate migration MigrationName
+rails generate migration MigrationName
 
 # Run migrations
-docker-compose exec foody_api rails db:migrate
+rails db:migrate
 
 # Rollback last migration
-docker-compose exec foody_api rails db:rollback
+rails db:rollback
 ```
 
 ### Seeds
 
 ```bash
 # Run seeds
-docker-compose exec foody_api rails db:seed
+rails db:seed
 
 # Reset database (drop, create, migrate, seed)
-docker-compose exec foody_api rails db:reset
+rails db:reset
 ```
 
 ### Console
 
 ```bash
 # Rails console
-docker-compose exec foody_api rails console
+rails console
 
 # Database console
-docker-compose exec foody_api rails db
+rails db
 ```
 
 ## API Endpoints
@@ -236,13 +187,13 @@ Environment variables are configured in `docker-compose.yml` for the PostgreSQL 
 
 ```bash
 # Run all tests
-docker-compose exec foody_api rspec
+rspec
 
 # Run specific test
-docker-compose exec foody_api rspec spec/requests/restaurants_spec.rb
+rspec spec/requests/restaurants_spec.rb
 
 # Run with coverage
-docker-compose exec foody_api rspec --format documentation
+rspec --format documentation
 ```
 
 ## Project Structure
@@ -278,50 +229,25 @@ app/
 - Enable `force_ssl` in production
 - Configure CORS for production domain
 
-### Docker Production
-
-```bash
-# Build production image
-docker build -t foody-api .
-
-# Run with production database
-docker run -e RAILS_ENV=production -e DATABASE_URL=postgresql://... foody-api
-```
-
 ## Troubleshooting
-
-### Container Won't Start
-
-1. Check logs:
-```bash
-docker-compose logs foody_api
-```
-
-2. Ensure database is running:
-```bash
-docker-compose ps postgres
-```
-
-3. Rebuild container:
-```bash
-docker-compose build --no-cache foody_api
-```
 
 ### Database Connection Issues
 
-1. Check PostgreSQL container:
+1. Check PostgreSQL is running:
 ```bash
-docker-compose exec postgres psql -U foody_user -d foody_development
+brew services list | grep postgresql
+# or
+sudo service postgresql status
 ```
 
 2. Reset database:
 ```bash
-docker-compose exec foody_api rails db:reset
+rails db:reset
 ```
 
 ### Gem Installation Issues
 
-Follow the gem installation steps above, ensuring you rebuild the container after adding new gems to the Gemfile.
+If you encounter issues with native gems, ensure you have the required system dependencies installed.
 
 ### CORS Issues
 
