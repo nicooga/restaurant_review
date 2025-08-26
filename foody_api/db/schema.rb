@@ -40,7 +40,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_21_153326) do
     t.datetime "updated_at", null: false
     t.index ["rating"], name: "index_reviews_on_rating"
     t.index ["restaurant_id", "created_at"], name: "index_reviews_on_restaurant_id_and_created_at"
-    t.index ["restaurant_id", "user_id"], name: "index_reviews_on_restaurant_id_and_user_id", unique: true
+    t.index ["restaurant_id", "user_id"], name: "index_reviews_on_restaurant_id_and_user_id"
     t.index ["restaurant_id"], name: "index_reviews_on_restaurant_id"
     t.index ["user_id", "created_at"], name: "index_reviews_on_user_id_and_created_at"
     t.index ["user_id"], name: "index_reviews_on_user_id"

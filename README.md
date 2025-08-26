@@ -110,6 +110,9 @@ docker-compose down
 # Restart a specific service
 docker-compose restart foody_api
 
+# Run a one off command, such as resetting the database
+docker-compose run --rm foody_api rails db:reset
+
 # View logs
 docker-compose logs foody_api
 docker-compose logs foody_ui
