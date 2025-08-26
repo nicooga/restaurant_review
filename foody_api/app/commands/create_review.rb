@@ -4,7 +4,6 @@ class CreateReview
   end
 
   def initialize(params)
-    @params = params
     @user = params[:user]
     @restaurant = params[:restaurant]
     @rating = params[:rating]
@@ -15,13 +14,13 @@ class CreateReview
     ActiveRecord::Base.transaction do
       create_review
       recalculate_restaurant_rating
-      @review
+      review
     end
   end
 
   private
 
-  attr_reader :params, :user, :restaurant, :rating, :comment, :review
+  attr_reader :user, :restaurant, :rating, :comment, :review
 
   def create_review
     @review = Review.create!(

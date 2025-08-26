@@ -87,10 +87,19 @@ docker-compose restart foody_ui
 
 **For Backend (Ruby gems):**
 ```bash
-# 1. Add gem to Gemfile
+# Add gem using bundle add (recommended)
+docker-compose exec foody_api bundle add gem-name
+
+# Restart the container
+docker-compose restart foody_api
+```
+
+**Alternative (manual Gemfile editing):**
+```bash
+# 1. Add gem to Gemfile manually
 echo 'gem "gem-name"' >> foody_api/Gemfile
 
-# 2. Rebuild container to install new gems
+# 2. Rebuild container to install new gems  
 docker-compose build --no-cache foody_api
 
 # 3. Restart the container
@@ -101,6 +110,8 @@ docker-compose restart foody_api
 
 Docker containers may use different CPU architectures than your host machine. Installing packages locally then running in Docker can cause native binary conflicts, especially with build tools like Vite, Rollup, and native Ruby extensions.
 
+For Ruby gems, `bundle add` is preferred because it properly updates both `Gemfile` and `Gemfile.lock` within the container while syncing changes to your host machine via volume mounting.
+
 ## Common Commands
 
 ```bash
@@ -109,6 +120,9 @@ docker-compose down
 
 # Restart a specific service
 docker-compose restart foody_api
+
+# Run a one off command, such as resetting the database
+docker-compose run --rm foody_api rails db:reset
 
 # View logs
 docker-compose logs foody_api
