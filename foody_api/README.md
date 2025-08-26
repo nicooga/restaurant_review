@@ -58,36 +58,43 @@ When adding new Ruby gems in a Docker environment, follow these steps:
 
 ### Installing New Gems
 
-1. **Add the gem to Gemfile**:
-```ruby
-gem 'new-gem-name'
+The correct way to add gems in Docker containers:
+
+```bash
+# Add gem using bundle add (updates both Gemfile and Gemfile.lock)
+docker-compose exec foody_api bundle add gem-name
+
+# Restart the container to load the new gem
+docker-compose restart foody_api
 ```
 
-2. **Rebuild the container** to install the new gem:
+**Why this works**: `bundle add` properly updates both `Gemfile` and `Gemfile.lock` files, which sync to your host machine via Docker volume mounting.
+
+### Alternative: Manual Gemfile editing + rebuild
+
+If you prefer to edit the Gemfile manually:
+
 ```bash
+# 1. Add gem to Gemfile manually
+echo 'gem "gem-name"' >> foody_api/Gemfile
+
+# 2. Rebuild the container to install the gem
 docker-compose build --no-cache foody_api
-```
 
-3. **Restart the container**:
-```bash
+# 3. Restart the container
 docker-compose restart foody_api
 ```
 
-### Alternative: Install in Running Container
+### Why `bundle add` Is Recommended
 
-If you need to test a gem quickly:
+Docker containers have isolated gem environments, but volume mounting allows file synchronization. The `bundle add` command:
 
-```bash
-# Install gem in running container
-docker-compose exec foody_api bundle install
+- ✅ **Updates both files**: Modifies both `Gemfile` and `Gemfile.lock` 
+- ✅ **Syncs to host**: Changes appear on your local machine via volume mounting
+- ✅ **No rebuild needed**: Gems are installed immediately in the running container
+- ✅ **Proper dependency resolution**: Bundler handles version conflicts automatically
 
-# Restart to ensure changes take effect
-docker-compose restart foody_api
-```
-
-### Why This Is Necessary
-
-Docker containers have isolated gem environments. When you add gems to the Gemfile, the container needs to rebuild its bundle to include the new dependencies.
+Manual `bundle install` after editing `Gemfile` can have sync issues with Docker volumes.
 
 ## Database Management
 
