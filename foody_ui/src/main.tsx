@@ -16,6 +16,10 @@ import { RestaurantDetail } from "./pages/RestaurantDetail";
 import { restaurantDetailLoader } from "./queries/restaurants";
 import { Routes } from "./utils/constants";
 
+import { UserPreferences } from "./pages/UserPreferences";
+import { CreateMealPlan } from "./pages/CreateMealPlan";
+import { MealPlanDetail } from "./pages/MealPlanDetail";
+
 // Create router configuration
 const router = createBrowserRouter([
   {
@@ -47,9 +51,23 @@ const router = createBrowserRouter([
         element: <Restaurants />,
       },
       {
+        path: "user-preferences",
+        element: <UserPreferences />,
+        loader: restaurantDetailLoader,
+      },
+      {
         path: "restaurants/:id",
         element: <RestaurantDetail />,
         loader: restaurantDetailLoader,
+      },
+      {
+        path: "organize-your-group-dinner",
+        element: <CreateMealPlan />,
+      },
+      {
+        path: "meal-plans/:id",
+        element: <MealPlanDetail />,
+        // loader: restaurantDetailLoader,
       },
       {
         path: "*",

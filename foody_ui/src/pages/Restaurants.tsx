@@ -375,6 +375,12 @@ export const Restaurants = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div className="flex px-4 py-6 sm:px-0">
+          <a className="btn-primary w-full text-4xl py-6" href="/organize-your-group-dinner">
+            Organize your group dinner!
+          </a>
+        </div>
+
         <div className="px-4 py-6 sm:px-0">
           {/* Header */}
           <div className="mb-8">
