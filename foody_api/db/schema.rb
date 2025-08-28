@@ -10,9 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_21_153326) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_28_023021) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "meal_plan_members", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "meal_plan_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["meal_plan_id"], name: "index_meal_plan_members_on_meal_plan_id"
+    t.index ["user_id"], name: "index_meal_plan_members_on_user_id"
+  end
+
+  create_table "meal_plans", force: :cascade do |t|
+    t.json "proposed_restaurants"
+    t.json "proposed_time_slots"
+    t.json "poll"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "restaurants", force: :cascade do |t|
     t.string "name", null: false
@@ -60,9 +77,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_21_153326) do
     t.string "password_digest", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.json "availability_schedule"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "meal_plan_members", "meal_plans"
+  add_foreign_key "meal_plan_members", "users"
   add_foreign_key "reviews", "restaurants"
   add_foreign_key "reviews", "users"
   add_foreign_key "sessions", "users"

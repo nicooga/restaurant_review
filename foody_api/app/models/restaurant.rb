@@ -49,6 +49,4 @@ class Restaurant < ApplicationRecord
   scope :by_cuisine, ->(cuisine) { where(cuisine_type: cuisine) if cuisine.present? }
   scope :by_max_price, ->(max_price) { where("price_range <= ?", max_price) if max_price.present? }
   scope :by_min_rating, ->(min_rating) { where("calculated_rating >= ?", min_rating) if min_rating.present? }
-
-
 end
