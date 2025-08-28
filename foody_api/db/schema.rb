@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_28_023021) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_28_144024) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -29,6 +29,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_28_023021) do
     t.json "poll"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "meal_preferences", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.json "cusine_preferences"
+    t.decimal "preferred_location_lat"
+    t.decimal "preferred_location_lng"
+    t.json "availability_schedule"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_meal_preferences_on_user_id"
   end
 
   create_table "restaurants", force: :cascade do |t|
@@ -83,6 +94,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_28_023021) do
 
   add_foreign_key "meal_plan_members", "meal_plans"
   add_foreign_key "meal_plan_members", "users"
+  add_foreign_key "meal_preferences", "users"
   add_foreign_key "reviews", "restaurants"
   add_foreign_key "reviews", "users"
   add_foreign_key "sessions", "users"

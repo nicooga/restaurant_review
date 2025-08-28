@@ -8,4 +8,11 @@ class User < ApplicationRecord
   validates :email_address, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
+
+  def cuisine_preferences
+    {
+      mexican: 3,
+      italian: 5
+    }
+  end
 end
